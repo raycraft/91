@@ -30,10 +30,8 @@ Or on Unix-like OS
 ### 双击  <label style="color:red">**run.bat**</label>运行
 
 ## 说明
-- parse_list.py 将所有视频url下载下来
-- parse_src.py 将所有视频的source下载下来，source复制到浏览器可以直接观看
-- common.py 通用的文件，保存一些常量
-- run.py, run.bat 运行脚本
+- parse.bat 解析Redis中的列表，获取视频的具体地址
+- run.bat 获取所有视频列表，具体视频地址由parse.bat批处理文件解析
 - src2file.py 将所有视频source复制到文本中，将文本的内容 `Ctrl` + `C`, 然后`Ctrl` + `V` 复制到迅雷里疯狂的下载吧
 
 # 忠告
