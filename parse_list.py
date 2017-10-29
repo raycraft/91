@@ -1,17 +1,33 @@
-import requests, re, redisutil, time, random, threading
+import requests, re, redisutil, time, random, threading, os
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 import common
 
 # 将列表页插入redis
-def parseList(url):
-    lst = re.compile(r'http:\/\/91\.91p17\.space\/view_video\.php\?viewkey\=\w+').findall(common.visit(url))
-    for a in set(lst):
-        if not redisutil.exists(a, common.KEY):
-            redisutil.add(a, common.KEY)
-            print(threading.current_thread().name, " insert into redis ", a)
-        else:
-            print(threading.current_thread().name, " redis 已经存在，不再访问 ", a)
+def parseList(url, page):
+	# 将当前现场访问的页码写入日志
+    with open("f:/" + threading.current_thread().name + ".log", "w") as f:
+        f.write(str(page))
+
+	# 程序强制退出后下次就不再从第一页开始了，直接从文件中读取
+    html = common.visit(url)
+    if html == "error" :
+        redisutil.add(url, "error")
+        print("出现错误了, ", url)
+        return
+    lst = re.compile(r'href="(.+?)"').findall(html)
+    result = []
+    for a in lst:
+        if "category=mr" in a:
+            result.append(a)
+    if result is not None and len(result) > 0:
+        for a in set(result): 
+            if not redisutil.exists(a, common.KEY) and not redisutil.exists(a, common.VISITED):
+                redisutil.add(a, common.KEY)    
+
+                print(threading.current_thread().name, " insert into redis ", a)
+            else:
+                print(threading.current_thread().name, " redis 已经存在，不再访问 ", a)
 
 '''
     线程主方法 
@@ -23,8 +39,10 @@ def enter(**kwargs):
         url = common.URL + "/v.php?next=watch&page=" + str(page)
         try:
             print(threading.current_thread().name, " 解析 ", page, " 页 ", url)
-            parseList(url)
-            time.sleep(random.randint(1, 3))
+            # print(threading.current_thread().name, " is invoking this method")
+            parseList(url, page)
+            # print(threading.current_thread().name, " finished invoking this method")
+            time.sleep(random.randint(1,3))
         except RuntimeError:
             print(threading.current_thread().name, " visiting page ", page, " occurs some errors ", RuntimeError.__with_traceback__)
             redisutil.add(url, "91_error")
@@ -43,10 +61,24 @@ def start():
         page_size = 1
         thread_total = total
     else:
-        page_size = total / 5 # start 5 thread to visit
-    
+        page_size = int(total / 5) # start 5 thread to visit
+    print("start ", thread_total, " thread to get data")
+
+
     for i in range(1, thread_total + 1):
-        start = (i - 1) * page_size + 1
+        file = "f:/a" + str(i) + ".log"
+        pre = None
+
+        if os.path.exists(file):
+            pre = open(file).read()
+        
+        start = 0
+
+        if pre is None or pre == "":
+            start = (i - 1) * page_size + 1
+        else:
+            start = int(pre)
+
         end = i * page_size + 1
         name = "a" + str(i)
         t = threading.Thread(target=enter, name=name, kwargs={"start":start,"end":end})
@@ -59,3 +91,5 @@ def start():
         t.join()
 		
     print("all thread over")
+
+start()

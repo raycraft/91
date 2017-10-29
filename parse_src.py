@@ -7,12 +7,24 @@ import common
 
 # 将列表页插入redis
 def parse(url, c):
-    d = pq(common.visit(url))
+    html = common.visit1(url)
+    if html == "error":
+        redisutil.add(url, "parse_error")
+        print("parsing url ", url, " has some errors")
+        return
+    d = pq(html)
     src = d("video").find("source").attr("src")
+    title = d("head").find("title").html()
+   	# 解析其他信息，时长，名字等
     if src != None:
     	print( threading.current_thread().name,  " insert into redis ", src)
-    	redisutil.add(src, common.KEY_SRC)
-    	c.lrem(common.KEY, 1, url)  
+    	c.lrem(common.KEY, 1, url)  # KEY 存储即将解析的url, VISITED 存储已经访问过并且已经 解析的url
+    	c.rpush(common.VISITED, url)
+    	c.rpush(common.SRC, src)
+    	print(threading.current_thread().name, " 解析了 ", title)
+    	if src is not None:
+    		name = src.split("?")[0].split("/")[-1]    	
+    		c.hset("91_detail", name, title) # 文件名和中文名的对应关系
     else:
     	print(threading.current_thread().name,  src, "解析为None, 插入 redis_error")
     	redisutil.add(src, common.KEY_NONE)
@@ -56,3 +68,5 @@ def start():
     	t.join()
 
     print("all thread over")
+
+start()

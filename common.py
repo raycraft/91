@@ -1,7 +1,7 @@
 import requests, re, redisutil, time, random, threading
 from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
-
+import urllib.request as request
 
 cookies = requests.cookies.RequestsCookieJar()
 cookies.set("language", "cn_CN", domain=".91.91p17.space", path="/")
@@ -9,12 +9,13 @@ cookies.set("language", "cn_CN", domain=".91.91p17.space", path="/")
 #--------------------------------------
 # 91 的临时站点，可以随时更换
 URL = "http://91.91p17.space/"
-KEY = "91"
-KEY_SRC = "91_src" # 每个视频源url对于的redis key
+KEY = "91_error"
 KEY_NONE = "91_none"
 LOG = "f:/log/visit.log"
 TORRENT = "f:/sed/"
 PARSE_LOG = "f:/log/parse.log"
+VISITED = "91_visited"
+SRC = "91_src"
 #----------------------------------------
 import os
 path = "/".join(LOG.split("/")[0:-1])
@@ -45,12 +46,31 @@ def getNumber():
 '''
    构造随机ip作为请求头访问目标站点
 '''
+def visit1(url):
+    try:
+        randomIP = str(random.randint(0, 255)) + "." + str(random.randint(0,255)) + "." + str(random.randint(0,255)) + "." + str(random.randint(0,255))
+        retries = Retry(total=5,backoff_factor=10, status_forcelist=[500,502,503,504])
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0',
+            'X-Forwarded-For': randomIP}
+        s = requests.Session()
+        s.mount('http://', HTTPAdapter(max_retries=retries))
+        html = s.get(url, headers=headers, cookies=cookies, timeout=5).text #设置比5秒超时，如果可以正常访问，则timeout不起作用，否则达到timeout之后，就可以出异常了，然后返回错误，，程序就不会一直死在那里了
+        return html
+    except:
+        return "error"
+
 def visit(url):
-    randomIP = str(random.randint(0, 255)) + "." + str(random.randint(0,255)) + "." + str(random.randint(0,255)) + "." + str(random.randint(0,255))
-    retries = Retry(total=5,backoff_factor=10, status_forcelist=[500,502,503,504])
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0',
-        'X-Forwarded-For': randomIP}
-    s = requests.Session()
-    s.mount('http://', HTTPAdapter(max_retries=retries))
-    html = s.get(url, headers=headers, cookies=cookies).text
-    return html
+    try:
+
+        randomIP = str(random.randint(0, 255)) + "." + str(random.randint(0,255)) + "." + str(random.randint(0,255)) + "." + str(random.randint(0,255))
+        # s = requests.Session()
+        # s.mount('http://', HTTPAdapter(max_retries=retries))
+        # html = s.get(url, headers=headers, cookies=cookies).text
+        r = request.Request(url)
+
+        r.add_header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0")
+        r.add_header("X-Forwarded-For", randomIP)
+        html = request.urlopen(r, timeout=5).read().decode("UTF-8")
+        return html
+    except:
+        return "error"

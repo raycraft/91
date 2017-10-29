@@ -1,7 +1,7 @@
 @echo off
-python run.py
+python parse_list.py
 
 
-echo 所有程序运行完毕
+echo over
 
 pause

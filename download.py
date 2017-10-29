@@ -24,10 +24,7 @@ def download(url):
     response = request.urlopen(req)
     file_size = int(response.getheader("Content-Length"))
     bytes_received = 0
-    dir = "e:/test/"
-    # 小于2g
-    if disk("e:") <= 2048:
-    	dir = "d:/test/"
+    dir = "f:/"
 
     try:
         with open(dir + str(random.randint(1, 99999999999999999999)) + ".mp4", 'wb') as dst_file:
@@ -70,4 +67,5 @@ if __name__ == "__main__":
 	# 	t.join()
 
 	# print("over")
-	enter(start=1, end=2)
+	# enter(start=1, end=2)
+	download("http://192.240.120.100//mp43/51121.mp4?st=uUS1OICY3_06DUnRcfX0Mg&e=1508055222")
