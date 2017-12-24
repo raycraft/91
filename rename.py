@@ -1,6 +1,7 @@
 import redis, os
 
-file_list = os.listdir("g:/1")
+BASE= "g:/91/"
+file_list = os.listdir(BASE)
 client = redis.StrictRedis("localhost", 6379)
 key_list = client.hkeys("91_detail")	
 for a in file_list:
@@ -13,8 +14,8 @@ for a in file_list:
 				value = client.hget("91_detail", key).decode("utf-8").replace("\n", "").replace(" ", "").replace("-Chinesehomemadevideo", "") \
 				.replace(":", "").replace("*", "").replace("?", "")
 				# .replace("\"", "").replace("\/", "").replace("\\\", ")
-				froma = "g:/1/" + str(key)
-				to = "g:/1/" + value + ".mp4"
+				froma = BASE + str(key)
+				to = BASE + value + ".mp4"
 				os.rename(froma, to)
 				print("rename file ", key, " to ", froma, to)
 				ok = True
