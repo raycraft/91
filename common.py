@@ -8,17 +8,19 @@ cookies.set("language", "cn_CN", domain=".91.91p17.space", path="/")
 
 #--------------------------------------
 # 91 的临时站点，可以随时更换
-URL = "http://91.91p17.space/"
-KEY = "91_error"
+URL = "http://91porn.com"
+KEY = "91"
 KEY_NONE = "91_none"
-LOG = "f:/log/visit.log"
-TORRENT = "f:/sed/"
-PARSE_LOG = "f:/log/parse.log"
+LOG = "log/visit.log"
+TORRENT = "sed/"
+PARSE_LOG = "log/parse.log"
 VISITED = "91_visited"
 SRC = "91_src"
 #----------------------------------------
 import os
 path = "/".join(LOG.split("/")[0:-1])
+
+print(path)
 
 if not os.path.exists(TORRENT):
 	os.makedirs(TORRENT)

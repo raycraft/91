@@ -6,7 +6,7 @@ import common
 # 将列表页插入redis
 def parseList(url, page):
 	# 将当前现场访问的页码写入日志
-    with open("f:/" + threading.current_thread().name + ".log", "w") as f:
+    with open("log/" + threading.current_thread().name + ".log", "w") as f:
         f.write(str(page))
 
 	# 程序强制退出后下次就不再从第一页开始了，直接从文件中读取
@@ -66,7 +66,7 @@ def start():
 
 
     for i in range(1, thread_total + 1):
-        file = "f:/a" + str(i) + ".log"
+        file = "log/" + str(i) + ".log"
         pre = None
 
         if os.path.exists(file):

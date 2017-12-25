@@ -1,6 +1,6 @@
 import redis, os
 
-BASE= "g:/91/"
+BASE= "sed"
 file_list = os.listdir(BASE)
 client = redis.StrictRedis("localhost", 6379)
 key_list = client.hkeys("91_detail")	
