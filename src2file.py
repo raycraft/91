@@ -1,7 +1,6 @@
 import redis, math, common
 
 c = redis.StrictRedis("localhost", 6379)
-c = redis.StrictRedis("localhost", 6379)
 lst = c.lrange(common.SRC, 0, -1)
 
 total = len(lst)
