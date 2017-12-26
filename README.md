@@ -21,6 +21,7 @@ Or on Unix-like OS
     $ pip install requests    
 
 安装 pyquery 解析视频源地址时用的到
+
     $ pip install pyquery
 
 # 启动
