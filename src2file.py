@@ -1,11 +1,7 @@
 import redis, math, common
 
-<<<<<<< HEAD
-c = redis.StrictRedis("192.168.244.129", 6379)
-=======
-# 将每个视频的url写入文件，然后用迅雷拖吧
 c = redis.StrictRedis("localhost", 6379)
->>>>>>> 53268138a148f0052c8b0e9b8bb7904fc14876f3
+c = redis.StrictRedis("localhost", 6379)
 lst = c.lrange(common.SRC, 0, -1)
 
 total = len(lst)
